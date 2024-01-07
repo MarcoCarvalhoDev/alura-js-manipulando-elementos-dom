@@ -8,12 +8,14 @@ const botoes = document.querySelectorAll('.app__card-button');
 const startPauseBt = document.querySelector('#start-pause');
 const musicaFocoInput = document.querySelector('#alternar-musica');
 const iniciarOuPausarBt = document.querySelector('#start-pause span');
+const iniciarOuPausarBtIcon = document.querySelector('.app__card-primary-button-icon');
+const tempoNaTela = document.querySelector('#timer');
 const musica = new Audio('sons/luna-rise-part-one.mp3'); // variaveis criadas para armazenar sons e audios
 const audioPlay = new Audio('sons/play.wav'); 
 const audioTempoFinalizado = new Audio('sons/beep.mp3');
 const audioPausa = new Audio('sons/pause.mp3');
 
-let tempoDecorridoEmSegundos = 5; //armazena o valor de tempo para o temporizador
+let tempoDecorridoEmSegundos = 1500; //armazena o valor de tempo para o temporizador
 let intervaloId = null;
 
 musica.loop = true; // para manter a musica tocando em loop
@@ -28,21 +30,25 @@ musicaFocoInput.addEventListener('change', () => { // cria funcionalidade do bot
 })
 
 focoBt.addEventListener('click', () => { // adicionar eventos através do método .addEventListener
+  tempoDecorridoEmSegundos =  1500; 
   alterarContexto('foco');
   focoBt.classList.add('active');
 })
 
 curtoBt.addEventListener('click', () => {
+  tempoDecorridoEmSegundos =  300; // altera o valor da variavel tempo de acordo com o contexto
   alterarContexto('descanso-curto');
   curtoBt.classList.add('active');
 })
 
 longoBt.addEventListener('click', () => {
+  tempoDecorridoEmSegundos =  900; 
   alterarContexto('descanso-longo');
   longoBt.classList.add('active'); 
   })
 
   function alterarContexto(contexto) { // criando uma função para reduzir código repetido ao realizar as alterações na pág. ao clicar nos botões
+    mostrarTempo(); // sempre que chamada a funcao que altera o contexto, chama a funcao mostrar tempo para exibir o novo tempo de acordo com o contexto (foco, descanso curto ou longo)
     botoes.forEach(function (contexto) { // através de uma iteração, muda o design dos botões ao serem clicados
       contexto.classList.remove('active');
     })
@@ -79,7 +85,7 @@ longoBt.addEventListener('click', () => {
       return;
     }
     tempoDecorridoEmSegundos -= 1; // decremento do tempo (variavel -= 1)
-    console.log('Temporizador: ' + tempoDecorridoEmSegundos); // mensagem de controle (erros)
+    mostrarTempo();
   }
 
   startPauseBt.addEventListener('click', iniciarOuPausar); // adiciona eveto de click ao botao startPauseBt
@@ -93,10 +99,20 @@ longoBt.addEventListener('click', () => {
     audioPlay.play();
     intervaloId = setInterval(contagemRegressiva, 1000)  // metodo setInterval, que executa uma funcao ou chama uma variavel a cada x tempo (1000 no caso)
     iniciarOuPausarBt.textContent = "Pausar";
+    iniciarOuPausarBtIcon.setAttribute('src', 'imagens/pause.png');
   }
 
   function zerar() { // funcao para zerar a contagem e retornar para os valores iniciais
     clearInterval(intervaloId);
     iniciarOuPausarBt.textContent = "Começar";
+    iniciarOuPausarBtIcon.setAttribute('src', 'imagens/play_arrow.png');
     intervaloId = null;
   }
+
+  function mostrarTempo () {
+    const tempo = new Date(tempoDecorridoEmSegundos * 1000);
+    const tempoFormatado = tempo.toLocaleString('pt-br',{minute: '2-digit', second: '2-digit'})
+    tempoNaTela.innerHTML = `${tempoFormatado}`;
+  }
+
+  mostrarTempo() // para exibir o tempo inicial sempre na tela
