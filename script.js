@@ -5,10 +5,19 @@ const longoBt = document.querySelector('.app__card-button--longo');
 const banner = document.querySelector('.app__image');
 const titulo = document.querySelector('.app__title');
 const botoes = document.querySelectorAll('.app__card-button');
+const startPauseBt = document.querySelector('#start-pause');
 const musicaFocoInput = document.querySelector('#alternar-musica');
-const musica = new Audio('sons/luna-rise-part-one.mp3');
-musica.loop = true; // para manter a musica tocando em loop  
+const iniciarOuPausarBt = document.querySelector('#start-pause span');
+const musica = new Audio('sons/luna-rise-part-one.mp3'); // variaveis criadas para armazenar sons e audios
+const audioPlay = new Audio('sons/play.wav'); 
+const audioTempoFinalizado = new Audio('sons/beep.mp3');
+const audioPausa = new Audio('sons/pause.mp3');
 
+let tempoDecorridoEmSegundos = 5; //armazena o valor de tempo para o temporizador
+let intervaloId = null;
+
+musica.loop = true; // para manter a musica tocando em loop
+  
 musicaFocoInput.addEventListener('change', () => { // cria funcionalidade do botao musica ao ser ativado, ligar a musica
   if(musica.paused) {
     musica.play();
@@ -60,4 +69,34 @@ longoBt.addEventListener('click', () => {
       default:
           break;
   }
+  }
+
+  const contagemRegressiva = () => { // variavel contagem regressiva que iniciada, verifica o tempo ate ser menor ou igual a 0 para executa-la
+    if (tempoDecorridoEmSegundos <= 0 ) {
+      audioTempoFinalizado.play();
+      alert('Tempo Finalizado!'); // mensagem alert e audio executados ao fim da contagem regressiva
+      zerar();
+      return;
+    }
+    tempoDecorridoEmSegundos -= 1; // decremento do tempo (variavel -= 1)
+    console.log('Temporizador: ' + tempoDecorridoEmSegundos); // mensagem de controle (erros)
+  }
+
+  startPauseBt.addEventListener('click', iniciarOuPausar); // adiciona eveto de click ao botao startPauseBt
+
+  function iniciarOuPausar() { // funcao para iniciar ou pausar a contagem regressiva
+    if (intervaloId) {
+      audioPausa.play();
+      zerar();
+      return
+    }
+    audioPlay.play();
+    intervaloId = setInterval(contagemRegressiva, 1000)  // metodo setInterval, que executa uma funcao ou chama uma variavel a cada x tempo (1000 no caso)
+    iniciarOuPausarBt.textContent = "Pausar";
+  }
+
+  function zerar() { // funcao para zerar a contagem e retornar para os valores iniciais
+    clearInterval(intervaloId);
+    iniciarOuPausarBt.textContent = "Começar";
+    intervaloId = null;
   }
